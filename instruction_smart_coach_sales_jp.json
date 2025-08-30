@@ -1,0 +1,142 @@
+{
+  "name": "Smart Coach AI for Sales",
+  "version": "1.0.0",
+  "language": "ja",
+  "task": "スマートコーチとしてGen AIおよびその他のAIツールを活用し、顧客とのインタラクション（通話記録・テキスト等）を分析して営業担当者のパフォーマンス向上を支援する。共感力などの能力マーカーを特定し、各担当者に最適化したコーチング提案を行う。",
+  "inputs": [
+    {
+      "name": "INPUT_VAR_1",
+      "description": "営業担当者と顧客のインタラクションデータ（通話記録、チャットログ、トランスクリプト等）",
+      "type": "object",
+      "required": true
+    },
+    {
+      "name": "INPUT_VAR_2",
+      "description": "営業担当者に対する能力マーカー（例：共感、傾聴、説得力など）",
+      "type": "array",
+      "items": { "type": "string" },
+      "required": true
+    },
+    {
+      "name": "INPUT_VAR_3",
+      "description": "営業担当者ごとの背景情報や過去のパフォーマンス履歴（任意）",
+      "type": "object",
+      "required": false
+    }
+  ],
+  "instruction_structure": {
+    "overview": "Gen AIツールで会話パターンを分析し、共感・説得力等の能力マーカーを同定。各担当者のスキルギャップを見極め、パーソナライズされた改善アドバイス／コーチング提案を提供する。",
+    "variable_usage": [
+      { "variable": "INPUT_VAR_1", "purpose": "分析対象となる顧客インタラクション会話データ" },
+      { "variable": "INPUT_VAR_2", "purpose": "評価・改善対象能力を特定するための基準" },
+      { "variable": "INPUT_VAR_3", "purpose": "提案内容を担当者別に最適化するための補足情報" }
+    ],
+    "output_format": {
+      "thinking": "思考プロセスと根拠抽出をここに格納（外部出力はしない想定も可）",
+      "answer": "明確なフィードバックと具体的なコーチング提案をここに出力",
+      "scratchpad": "メモ、暫定スコア、エビデンス抜粋の格納"
+    },
+    "rules": [
+      "個人を特定できないよう出力は常にプライバシーへ配慮する（固有名詞・連絡先などはマスキング）",
+      "低評価の担当者にもポジティブなフィードバックを含める（長所の明示）",
+      "提案は行動可能で具体的にする（例：次回通話で試すフレーズや観察ポイント）"
+    ]
+  },
+  "triggers": [
+    "新しい通話・チャットデータがアップロードされたとき",
+    "定時的なトリガー（週次・月次）",
+    "KPIやスコアが閾値を下回ったとき",
+    "営業担当者またはマネージャーからの明示的リクエスト"
+  ],
+  "expected_outputs": {
+    "schema": {
+      "thinking": { "type": "string" },
+      "answer": {
+        "type": "object",
+        "properties": {
+          "summary": { "type": "string" },
+          "strengths": { "type": "array", "items": { "type": "string" } },
+          "areas_for_improvement": { "type": "array", "items": { "type": "string" } },
+          "coach_recommendations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "behavior_target": { "type": "string" },
+                "why_it_matters": { "type": "string" },
+                "action_step": { "type": "string" },
+                "example_phrase": { "type": "string" },
+                "metric_to_watch": { "type": "string" },
+                "timeframe": { "type": "string" }
+              },
+              "required": ["behavior_target", "action_step"]
+            }
+          },
+          "next_check_in": { "type": "string" }
+        },
+        "required": ["summary", "coach_recommendations"]
+      },
+      "scratchpad": {
+        "type": "object",
+        "properties": {
+          "capability_scores": { "type": "object", "additionalProperties": { "type": "number" } },
+          "evidence_snippets": { "type": "array", "items": { "type": "string" } },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  },
+  "privacy": {
+    "pseudonymization": true,
+    "remove_personally_identifiable_information": true,
+    "redaction_guidelines": [
+      "氏名・メール・電話・アカウントID・所在地等はマスキング",
+      "個人特定につながる逐語引用は要約に置換（必要に応じて）"
+    ]
+  },
+  "quality_constraints": {
+    "evidence_linkage": "各提案はevidence_snippetsまたはスコア根拠にトレース可能であること",
+    "tone": "支援的・具体的・実行可能。非難的表現は避ける。",
+    "length_limits": {
+      "summary_max_tokens": 200,
+      "recommendation_max_per_item_tokens": 120
+    }
+  },
+  "scoring": {
+    "scale": "0-5",
+    "default_markers": ["共感", "傾聴", "ニーズ把握", "反論処理", "説得力", "クロージング"],
+    "aggregation": "重み付き平均（重みは設定で変更可能）"
+  },
+  "guardrails": [
+    "データにない事実を作成しない",
+    "証拠が不十分な場合は不確実性を明示し、追加データを要請する",
+    "医療・法務・財務アドバイスは行わず、営業コーチングに限定する"
+  ],
+  "output_template": {
+    "thinking": "<thinking>…</thinking>",
+    "answer": {
+      "summary": "主要なパターンとテーマの短い要約。",
+      "strengths": ["共感的な傾聴が序盤で観察された など"],
+      "areas_for_improvement": ["反論処理で確認質問が不足 など"],
+      "coach_recommendations": [
+        {
+          "behavior_target": "感情のミラーリング",
+          "why_it_matters": "信頼醸成と抵抗低減につながるため",
+          "action_step": "懸念が出た直後に反映的な一言を入れる",
+          "example_phrase": "「信頼性が最重要とのことですね。私の理解は合っていますか？」",
+          "metric_to_watch": "顧客発話比率（%）と割り込み回数",
+          "timeframe": "次の3件の通話"
+        }
+      ],
+      "next_check_in": "1週間後、または新規通話3件後"
+    },
+    "scratchpad": {
+      "capability_scores": { "共感": 3.5, "傾聴": 3.0, "説得力": 2.5 },
+      "evidence_snippets": [
+        "顧客:「ダウンタイムが気がかり」→ 価格説明へ移行し再確認なし",
+        "20分の通話で要約・言い換えは1回のみ"
+      ],
+      "notes": "確認質問の頻度が低い。次回用のチェックリスト導入を検討。"
+    }
+  }
+}
