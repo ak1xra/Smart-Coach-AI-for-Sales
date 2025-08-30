@@ -22,6 +22,10 @@
 - KPIやスコアが閾値を下回ったとき  
 - 営業担当者またはマネージャーからのリクエスト  
 
+### 関連ファイル
+- [instruction_smart_coach_sales_jp.md](https://github.com/ak1xra/Smart-Coach-AI-for-Sales/blob/main/instruction_smart_coach_sales_jp.md)  
+- [instruction_smart_coach_sales_jp.json](https://github.com/ak1xra/Smart-Coach-AI-for-Sales/blob/main/instruction_smart_coach_sales_jp.json)  
+
 ---
 
 ## English
@@ -45,3 +49,7 @@
 - On scheduled triggers (weekly/monthly)  
 - When KPIs or scores fall below thresholds  
 - Upon explicit request by a rep or manager  
+
+### Related Files
+- [instruction_smart_coach_sales_en.md](https://github.com/ak1xra/Smart-Coach-AI-for-Sales/blob/main/instruction_smart_coach_sales_en.md)  
+- [instruction_smart_coach_sales_en.json](https://github.com/ak1xra/Smart-Coach-AI-for-Sales/blob/main/instruction_smart_coach_sales_en.json)  
